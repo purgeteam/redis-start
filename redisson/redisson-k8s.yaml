@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-test
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisson
+  namespace: demo-test
+  labels:
+    app: redisson
+spec:
+  type: NodePort
+  ports:
+    - port: 7000
+#      nodePort: 31099
+  selector:
+    app: redisson
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisson
+  labels:
+    app: redisson
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redisson
+  template:
+    metadata:
+      labels:
+        app: redisson
+    spec:
+      containers:
+        - name: elk-engine
+          image: registry.cn-hangzhou.aliyuncs.com/engine/redisson:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7000
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
