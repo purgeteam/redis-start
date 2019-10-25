@@ -1,6 +1,5 @@
 package com.purge.redisson.config;
 
-import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -8,6 +7,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 
 @Configuration
 public class RedissonConfig implements EnvironmentAware {
@@ -39,18 +39,18 @@ public class RedissonConfig implements EnvironmentAware {
         String password = environment.getProperty(PASSWORD_KEY);
         Config config = new Config();
 
-        if (StringUtils.isNoneEmpty(host)) {
+        if (StringUtils.isEmpty(host)) {
             String port = environment.getProperty(PORT_KEY);
-            if (!StringUtils.isNoneEmpty(port)) {
+            if (!StringUtils.isEmpty(port)) {
                 throw new IllegalArgumentException("[getRedisson] port is null.");
             }
             config.useSingleServer().setAddress(PREFIX + host + ":" + port);
-            if (StringUtils.isNoneEmpty(password)) {
+            if (StringUtils.isEmpty(password)) {
                 config.useSingleServer().setPassword(password);
             }
         } else {
             String cluster = environment.getProperty(CLUSTER_KEY);
-            if (!StringUtils.isNoneEmpty(cluster)) {
+            if (!StringUtils.isEmpty(cluster)) {
                 throw new IllegalArgumentException("[getRedisson] cluster is null.");
             }
             String[] nodes = cluster.split(",");
@@ -58,7 +58,7 @@ public class RedissonConfig implements EnvironmentAware {
                 nodes[i] = PREFIX + nodes[i];
             }
             config.useClusterServers().setScanInterval(2000).addNodeAddress(nodes);
-            if (StringUtils.isNoneEmpty(password)) {
+            if (StringUtils.isEmpty(password)) {
                 config.useClusterServers().setPassword(password);
             }
         }
