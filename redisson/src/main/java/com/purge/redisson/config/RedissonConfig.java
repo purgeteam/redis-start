@@ -39,18 +39,18 @@ public class RedissonConfig implements EnvironmentAware {
         String password = environment.getProperty(PASSWORD_KEY);
         Config config = new Config();
 
-        if (StringUtils.isEmpty(host)) {
+        if (!StringUtils.isEmpty(host)) {
             String port = environment.getProperty(PORT_KEY);
-            if (!StringUtils.isEmpty(port)) {
+            if (StringUtils.isEmpty(port)) {
                 throw new IllegalArgumentException("[getRedisson] port is null.");
             }
             config.useSingleServer().setAddress(PREFIX + host + ":" + port);
-            if (StringUtils.isEmpty(password)) {
+            if (!StringUtils.isEmpty(password)) {
                 config.useSingleServer().setPassword(password);
             }
         } else {
             String cluster = environment.getProperty(CLUSTER_KEY);
-            if (!StringUtils.isEmpty(cluster)) {
+            if (StringUtils.isEmpty(cluster)) {
                 throw new IllegalArgumentException("[getRedisson] cluster is null.");
             }
             String[] nodes = cluster.split(",");
@@ -58,7 +58,7 @@ public class RedissonConfig implements EnvironmentAware {
                 nodes[i] = PREFIX + nodes[i];
             }
             config.useClusterServers().setScanInterval(2000).addNodeAddress(nodes);
-            if (StringUtils.isEmpty(password)) {
+            if (!StringUtils.isEmpty(password)) {
                 config.useClusterServers().setPassword(password);
             }
         }
